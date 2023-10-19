@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import { SchemaValidator } from './validators/SchemaValidator';
+import { CloudFormationGenerator } from './resource-generators/CloudFormation';
 
 async function main(filePath: string) {
   try {
@@ -15,6 +16,11 @@ async function main(filePath: string) {
     // Log the validation result
     if (isValid) {
       console.log('The JSON configuration is valid.');
+      const couldFormation = new CloudFormationGenerator();
+      const resouceGroups = Object.keys(jsonData);
+      resouceGroups.forEach(resouceGroup => {
+        couldFormation.generateResourceGroup(jsonData[resouceGroup]);
+      });
     } else {
       console.log('The JSON configuration is invalid.');
     }
