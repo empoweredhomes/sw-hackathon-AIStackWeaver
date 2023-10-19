@@ -1,3 +1,5 @@
+import { BaseResource } from "../types/BaseResource";
+
 export interface ResourceGenerator {
-    generateResource(): void;
+    generateResource(resource: BaseResource): void;
 }
