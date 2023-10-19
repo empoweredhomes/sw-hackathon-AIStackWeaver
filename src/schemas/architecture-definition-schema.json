@@ -1,0 +1,315 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "ResourceGroup": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Resources": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/NoSQLDatabase"
+                            },
+                            {
+                                "$ref": "#/definitions/ApiGateway"
+                            },
+                            {
+                                "$ref": "#/definitions/Function"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "ResourceGroup"
+    ],
+    "definitions": {
+        "NoSQLDatabase": {
+            "type": "object",
+            "properties": {
+                "ResourceCategory": {
+                    "const": "Database"
+                },
+                "ResourceType": {
+                    "enum": [
+                        "NoSQLDatabase"
+                    ]
+                },
+                "Configuration": {
+                    "type": "object",
+                    "properties": {
+                        "TableName": {
+                            "type": "string"
+                        },
+                        "PrimaryKey": {
+                            "type": "object",
+                            "properties": {
+                                "Name": {
+                                    "type": "string"
+                                },
+                                "DataType": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "SecondaryKey": {
+                            "type": "object",
+                            "properties": {
+                                "Name": {
+                                    "type": "string"
+                                },
+                                "DataType": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "CustomAttributes": {
+                            "type": "object",
+                            "properties": {
+                                "BillingConfiguration": {
+                                    "type": "string"
+                                },
+                                "ThroughputConfig": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Read": {
+                                            "type": "integer"
+                                        },
+                                        "Write": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "DataExpiryField": {
+                                    "type": "string"
+                                },
+                                "EncryptionConfig": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Type": {
+                                            "type": "string"
+                                        },
+                                        "Key": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "TableName",
+                        "PrimaryKey"
+                    ]
+                }
+            },
+            "required": [
+                "ResourceCategory",
+                "ResourceType",
+                "Configuration"
+            ]
+        },
+        "ApiGateway": {
+            "type": "object",
+            "properties": {
+                "ResourceCategory": {
+                    "const": "APIManagement"
+                },
+                "ResourceType": {
+                    "enum": [
+                        "ApiGateway"
+                    ]
+                },
+                "Configuration": {
+                    "type": "object",
+                    "properties": {
+                        "ApiName": {
+                            "type": "string"
+                        },
+                        "Routes": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "AllowedChildren": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "const": "Function"
+                                        }
+                                    },
+                                    "Path": {
+                                        "type": "string"
+                                    },
+                                    "Method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "GET",
+                                            "POST",
+                                            "PUT",
+                                            "DELETE",
+                                            "PATCH"
+                                        ]
+                                    },
+                                    "Resource": {
+                                        "$ref": "#/definitions/Function"
+                                    }
+                                },
+                                "required": [
+                                    "AllowedChildren",
+                                    "Path",
+                                    "Method",
+                                    "Resource"
+                                ]
+                            }
+                        },
+                        "AccessControl": {
+                            "type": "object",
+                            "properties": {
+                                "Authentication": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Type": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "RateLimit": {
+                                    "type": "object",
+                                    "properties": {
+                                        "PerSecond": {
+                                            "type": "integer"
+                                        },
+                                        "PerDay": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "CustomAttributes": {
+                            "type": "object",
+                            "properties": {
+                                "Logging": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Enabled": {
+                                            "type": "boolean"
+                                        },
+                                        "Format": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "ApiName",
+                        "Routes"
+                    ]
+                }
+            },
+            "required": [
+                "ResourceCategory",
+                "ResourceType",
+                "Configuration"
+            ]
+        },
+        "Function": {
+            "type": "object",
+            "properties": {
+                "ResourceCategory": {
+                    "const": "Compute"
+                },
+                "ResourceType": {
+                    "enum": [
+                        "Function"
+                    ]
+                },
+                "Configuration": {
+                    "type": "object",
+                    "properties": {
+                        "Name": {
+                            "type": "string"
+                        },
+                        "Runtime": {
+                            "type": "string"
+                        },
+                        "Handler": {
+                            "type": "string"
+                        },
+                        "MemorySize": {
+                            "type": "integer"
+                        },
+                        "Timeout": {
+                            "type": "integer"
+                        },
+                        "AccessControl": {
+                            "type": "object",
+                            "properties": {
+                                "Permissions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Resource": {
+                                                "type": "string"
+                                            },
+                                            "ResourceType": {
+                                                "type": "string"
+                                            },
+                                            "Actions": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Environment": {
+                            "type": "object",
+                            "properties": {
+                                "Variables": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Name": {
+                                                "type": "string"
+                                            },
+                                            "Value": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "Name",
+                        "Runtime",
+                        "Handler"
+                    ]
+                }
+            },
+            "required": [
+                "ResourceCategory",
+                "ResourceType",
+                "Configuration"
+            ]
+        }
+    }
+}

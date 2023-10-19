@@ -1,0 +1,95 @@
+{
+    "ResourceGroup": {
+        "Name": "ThermoCloudStack",
+        "Resources": [
+            {
+                "ResourceCategory": "Database",
+                "ResourceType": "NoSQLDatabase",
+                "Configuration": {
+                    "TableName": "HeatSource",
+                    "PrimaryKey": {
+                        "Name": "Id",
+                        "DataType": "String"
+                    },
+                    "SecondaryKey": {
+                        "Name": "Timestamp",
+                        "DataType": "Number"
+                    },
+                    "CustomAttributes": {
+                        "BillingConfiguration": "Provisioned",
+                        "ThroughputConfig": {
+                            "Read": 5,
+                            "Write": 5
+                        },
+                        "DataExpiryField": "ExpiryDate"
+                    }
+                },
+                "AllowedChildren": []
+            },
+            {
+                "ResourceCategory": "APIManagement",
+                "ResourceType": "ApiGateway",
+                "Configuration": {
+                    "ApiName": "ThermoNuclearAPI",
+                    "Routes": [
+                        {
+                            "AllowedChildren": [
+                                "Function"
+                            ],
+                            "Path": "/bringtheheat",
+                            "Method": "GET",
+                            "Resource": {
+                                "ResourceCategory": "Compute",
+                                "ResourceType": "Function",
+                                "Configuration": {
+                                    "Name": "HeatExtractor",
+                                    "Runtime": "NodeJS",
+                                    "Handler": "heat-extractor.handler",
+                                    "MemorySize": 128,
+                                    "Timeout": 3,
+                                    "AccessControl": {
+                                        "Permissions": [
+                                            {
+                                                "Resource": "HeatSource",
+                                                "ResourceType": "NoSQLDatabase",
+                                                "Actions": [
+                                                    "Read"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "Environment": {
+                                        "Variables": [
+                                            {
+                                                "Name": "Company",
+                                                "Value": "Mysa"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "AccessControl": {
+                        "Authentication": {
+                            "Type": "API_KEY"
+                        },
+                        "RateLimit": {
+                            "PerSecond": 100,
+                            "PerDay": 10000
+                        }
+                    },
+                    "CustomAttributes": {
+                        "Logging": {
+                            "Enabled": true,
+                            "Format": "JSON"
+                        }
+                    }
+                },
+                "AllowedChildren": [
+                    "Function"
+                ]
+            }
+        ]
+    }
+}
