@@ -43,10 +43,8 @@ export class DatabaseGenerator implements ResourceGenerator{
               type: dynamodb.AttributeType.${SecondaryKey.DataType.toUpperCase()}
             },` : ''}
             ${CustomAttributes.BillingConfiguration ? `billingMode: dynamodb.BillingMode.${CustomAttributes.BillingConfiguration.toUpperCase()},` : ''}
-            ${CustomAttributes.ThroughputConfig ? `provisionedThroughput: {
-              readCapacity: ${CustomAttributes.ThroughputConfig.Read},
-              writeCapacity: ${CustomAttributes.ThroughputConfig.Write}
-            },` : ''}
+            ${CustomAttributes.ThroughputConfig ? `readCapacity: ${CustomAttributes.ThroughputConfig.Read},
+            writeCapacity: ${CustomAttributes.ThroughputConfig.Write},` : ''}
             ${CustomAttributes.DataExpiryField ? `timeToLiveAttribute: '${CustomAttributes.DataExpiryField}',` : ''}
             ${CustomAttributes.EncryptionConfig ? `encryption: dynamodb.TableEncryption.${CustomAttributes.EncryptionConfig.Type.toUpperCase()},` : ''}
           });

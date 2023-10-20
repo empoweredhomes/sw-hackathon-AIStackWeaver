@@ -1,0 +1,24 @@
+
+    {
+        "name": "aws-cdk-project",
+        "version": "0.1.0",
+        "bin": {
+            "aws-cdk-project": "bin/aws-cdk-project.js"
+        },
+        "scripts": {
+            "build": "tsc",
+            "watch": "tsc -w",
+            "cdk": "cdk"
+        },
+        "devDependencies": {
+            "@aws-cdk/assert": "latest",
+            "aws-cdk-lib": "latest",
+            "typescript": "^4.1.5",
+            "aws-cdk": "^1.89.0",
+            "@aws-cdk/aws-apigateway": "^1.89.0",
+            "@aws-cdk/aws-dynamodb": "^1.89.0",
+            "@aws-cdk/aws-lambda": "^1.89.0",
+            "@aws-cdk/core": "^1.89.0",
+            "constructs": "^10.0.5"
+        }
+    }

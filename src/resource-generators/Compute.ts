@@ -35,7 +35,7 @@ export class ComputeGenerator implements ResourceGenerator{
             }
             return `const ${permission.Resource}Policy = new iam.PolicyStatement({
               actions: [${permission.Actions.map(action => `"${this.policyActionsMap[action]}"`).join(", ")}],
-              resources: [props.resouceIds["${permission.ResourceType}::${permission.Resource}"],
+              resources: [props.resouceIds["${permission.ResourceType}::${permission.Resource}"]],
             });
             ${Name}Lambda.addToRolePolicy(${permission.Resource}Policy);`;
           }).join("\n");
@@ -48,8 +48,8 @@ export class ComputeGenerator implements ResourceGenerator{
           
           export class ${Name}Lambda extends cdk.Construct {
             readonly resourceArn: string;
-            constructor(scope: cdk.Construct, id: string, props?: ConstructProps ) {
-              super(scope, id, props);
+            constructor(scope: cdk.Construct, id: string, props: ConstructProps ) {
+              super(scope, id);
     
               const ${Name}Lambda = new lambda.Function(this, "${Name}Function", {
                 runtime: lambda.Runtime.${Runtime.toUpperCase()},

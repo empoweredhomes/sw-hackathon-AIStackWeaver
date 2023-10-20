@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import { ResourceGenerator } from "../interfaces/ResourceGenerator";
 import { ApiGatewayResource } from "../types/APIManagement/ApiGatewayResource";
 import { ResourceType } from "../types/ResourceType";
+import { ComputeGenerator } from './Compute';
 
 export class APIManagementGenerator implements ResourceGenerator{
     // Create a map for api gateway route methods
@@ -12,6 +13,8 @@ export class APIManagementGenerator implements ResourceGenerator{
         DELETE: "DELETE",
         PATCH: "PATCH"
     };
+
+    private lambdaGenerator = new ComputeGenerator();
 
     public generateResource(resource: ApiGatewayResource): void {
         if (resource.ResourceType !== ResourceType.ApiGateway) return;
@@ -26,17 +29,22 @@ export class APIManagementGenerator implements ResourceGenerator{
             CustomAttributes  
         } = resource.Configuration;
       
+        let importLambda = '';
         const routes = Routes.map(route => {
             if (route.Resource.ResourceType !== ResourceType.Function) return '';
+            this.lambdaGenerator.generateResource(route.Resource);
+            importLambda = importLambda + `\n import { ${route.Resource.Configuration.Name}Lambda } from './${route.Resource.Configuration.Name}'`;
             return `
-            const lambdaFn = lambda.Function.fromFunctionArn(
+            const lambdaFn = new ${route.Resource.Configuration.Name}Lambda(this, '${route.Resource.Configuration.Name}Lambda', props);
+            const lambdaArn = lambdaFn.resourceArn;
+            const lambdaObj = lambda.Function.fromFunctionArn(
               this,
               '${route.Resource.Configuration.Name}Lambda',
-              props?.resouceIds["${ResourceType.Function}::${route.Resource.Configuration.Name}"]
+              lambdaArn
             );
             api.root.addResource('${route.Path.replace('/', '')}')
             .addMethod('${this.apiGatewayRouteMethods[route.Method]}', 
-            new apigateway.LambdaIntegration(lambdaFn), {
+            new apigateway.LambdaIntegration(lambdaObj), {
               authorizationType: apigateway.AuthorizationType.NONE
             });`
         }).join("\n");
@@ -47,11 +55,12 @@ export class APIManagementGenerator implements ResourceGenerator{
         import * as apigateway from '@aws-cdk/aws-apigateway';
         import * as lambda from '@aws-cdk/aws-lambda';
         import { ConstructProps } from './ConstructProps';
+        ${importLambda}
 
         export class ${ApiName}Api extends cdk.Construct {
           readonly resourceArn: string = '';
             constructor(scope: cdk.Construct, id: string, props?: ConstructProps) {
-                super(scope, id, props);
+                super(scope, id);
 
                 const api = new apigateway.RestApi(this, '${ApiName}Api', {
                     restApiName: '${ApiName}'
